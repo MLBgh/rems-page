@@ -717,21 +717,37 @@
                 return;
             }
 
-            // Simulate submission
+            // Submit to Google Forms
             const submitButton = waitlistForm.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.textContent = 'Joining...';
 
-            setTimeout(() => {
-                // Show success
+            // Google Form submission URL
+            const formURL = 'https://docs.google.com/forms/d/e/1FAIpQLSejVGVQBHcC4OZgwP1hzeXxn_vrX2upOwvvamc2YmWaUrWIGg/formResponse';
+            const formData = new FormData();
+            formData.append('entry.352675927', email);
+
+            // Submit to Google Forms using fetch with no-cors mode
+            fetch(formURL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            }).then(() => {
+                // Show success (no-cors doesn't return response, but submission works)
                 waitlistForm.classList.add('hidden');
                 successMessage.classList.remove('hidden');
                 showToast('Successfully joined the waitlist!');
 
                 // Reset form
+                emailInput.value = '';
                 submitButton.disabled = false;
                 submitButton.textContent = 'Join the waitlist';
-            }, 1500);
+            }).catch((error) => {
+                // Show error
+                showToast('Something went wrong. Please try again.', true);
+                submitButton.disabled = false;
+                submitButton.textContent = 'Join the waitlist';
+            });
         });
 
         // Email input validation on blur
